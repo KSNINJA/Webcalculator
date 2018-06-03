@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style type="text/css">
+    .button{
+        display: inline-block;
+        width: 24%;
+        font-size: 45px;
+        height: 100%;
+        padding:2%;
+    }
+    .button_row{
+
+        width:70%;
+        display: inline-block;
+    }
+    .text_field{
+        width:70%;
+        display: inline-block;
+        font-size: 50px;
+        text-align:right;
+        border:none;
+        margin-bottom: 1%
+    }
+</style>
+</head>
+<body>
+<div style="text-align: center;margin-top:2%">
+    
+<div style="width:90%;display: inline-block;">
+    <input  class="text_field" id="text1" style="font-size: 25px;color:#BDBDBD;margin-bottom: -1%;margin-right: 4%"></input>
+<input  class="text_field" id="text"></input>
+</div>
+<div class="button_row">
+    <button onClick="add_to_expression('(')" class="button" style="background-color:#D5D5D5;">(</button>
+    <button onClick="add_to_expression(')')" class="button" style="background-color:#D5D5D5;">)</button>
+    <button onClick="CE()" class="button" style="background-color:#D5D5D5;">CE</button>
+    <button onClick="AC()" class="button" style="background-color:#D5D5D5;">AC</button>
+</div>
+<div class="button_row">
+    <button onClick="add_to_expression('7')" class="button">7</button>
+    <button onClick="add_to_expression('8')" class="button">8</button>
+    <button onClick="add_to_expression('9')" class="button">9</button>
+    <button onClick="add_to_expression('/')" class="button" style="background-color:#D5D5D5;">/</button>
+</div>
+<div class="button_row">
+    <button onClick="add_to_expression('4')" class="button">4</button>
+    <button onClick="add_to_expression('5')" class="button">5</button>
+    <button onClick="add_to_expression('6')" class="button">6</button>
+    <button onClick="add_to_expression('*')" class="button" style="background-color:#D5D5D5;">*</button>
+</div>
+<div class="button_row">
+    <button onClick="add_to_expression('1')" class="button">1</button>
+    <button onClick="add_to_expression('2')" class="button">2</button>
+    <button onClick="add_to_expression('3')" class="button">3</button>
+    <button onClick="add_to_expression('-')" class="button" style="background-color:#D5D5D5;">-</button>
+</div>
+<div class="button_row">
+    <button onClick="add_to_expression('0')" class="button">0</button>
+    <button onClick="add_to_expression('.')" class="button">.</button>
+    <button onClick="equalTo()" class="button" style="background-color: #00A6FF">=</button>
+    <button onClick="add_to_expression('+')" class="button" style="background-color:#D5D5D5;">+</button>
+</div>
+</div>
+<script type="text/javascript">
+    function add_to_expression(character)
+    {
+       document.getElementById('text').value += character;
+    }
+    function priority(chara)
+    {
+        if(chara==='*' || chara==='/')
+        {
+            return 3;
+        }
+        if(chara==='+' || chara==='-')
+        {
+            return 2;
+        }
+        if(chara==='('){
+            return 1;
+        }
+
+    }
+
+    function equalTo()
+        {
+            var main=document.getElementById('text').value;
+            document.getElementById('text1').value=main;
+            main="(" + main + ")";
+            var mainLength=main.length;
+            var arr=[];     //  To store the postfix expression  . Its size is 39 , so that the user can evaluate maximum of 20 operands
+            var a=0;    // a is the current position in the array , in which the postfix expression is being stored
+            var stack = [];
+        for(var i=0;i<mainLength;i++)
+        {
+            if(main.charAt(i)>=0 && main.charAt(i)<=9){
+                 while((main.charAt(i)>=0) && (main.charAt(i)<=9) && i<mainLength || main.charAt(i)=='.')
+                 {
+                     arr[a] += main.charAt(i);
+                     i++;
+                 }
+                 arr[a] = arr[a].replace("undefined","");
+                 a++;
+                 i--;
+
+            }
+            else if(main.charAt(i) == '(')
+            {
+                stack.push('(');
+            }
+            else if(main.charAt(i)==')')
+            {
+                while(stack[stack.length-1]!='(')
+                {
+                    arr[a]= stack.pop();
+                    a++;
+                }
+
+            }
+            else{                          
+            var a1= priority(main.charAt(i))   ;
+            var a2=priority(stack[stack.length-1]);// If an operator is found
+                if(a1<=a2)  // priority is a function , which returns the operator precedence.
+                {
+                    while(priority(main.charAt(i))<=priority(stack[stack.length-1])) // The operator will pop till it has less than or equal precedence than the previous operator.
+                    {
+                        arr[a] = stack.pop();
+                        a++;
+                    }
+                    stack.push(main.charAt(i));
+                }
+                 else 
+                {
+                    stack.push(main.charAt(i));
+                }
+
+
+            }
+        }
+
+        var stack_result = [];
+        for(i=0;i<a;i++) {
+            if (arr[i].charAt(0) >= 0 && arr[i].charAt(0) <= 9)
+            {
+                stack_result.push(arr[i]);
+            }
+            else{
+                var y= parseFloat(stack_result.pop());
+                var z= parseFloat(stack_result.pop());
+                if(arr[i]=="/")
+                {
+                    stack_result.push(z/y);
+                }
+                else if(arr[i]=="*")
+                {
+                    stack_result.push(z*y);
+                }
+                else if(arr[i]=="+")
+                {
+                    stack_result.push(z+y);
+                }
+                else if(arr[i]=="-")
+                {
+                    stack_result.push(z-y);
+                }
+
+            }
+        }
+        document.getElementById('text').value = stack_result.pop();
+
+    }
+    function AC()
+    {
+        document.getElementById('text').value= '';
+        document.getElementById('text1').value= '';
+    }
+    function CE()
+    {
+        main = document.getElementById('text').value  ;
+        main = main.substring(0,main.length-1);
+        document.getElementById('text').value = main;
+    }
+   
+</script>
+
+</body>
+</html>
+
